@@ -5,7 +5,7 @@ const Hero: React.FC = () => {
   return (
     <section className="container mx-auto px-4 py-4 md:py-6">
       {/* Brand Gradient Background */}
-      <div className="bg-gradient-to-br from-[#6A368B] via-[#E72B56] to-[#FDBE15] rounded-3xl overflow-hidden relative min-h-[200px] md:min-h-[300px] flex items-center shadow-lg">
+      <div className="bg-gradient-to-br from-[#6A368B] via-[#E72B56] to-[#F48422] rounded-3xl overflow-hidden relative min-h-[200px] md:min-h-[300px] flex items-center shadow-lg">
         
         {/* Abstract Shapes/Texture */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
@@ -18,12 +18,12 @@ const Hero: React.FC = () => {
             </div>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-none tracking-tight">
               Nature's <br/>
-              <span className="text-secondary">Superfoods.</span>
+              <span className="text-white opacity-90">Superfoods.</span>
             </h2>
             <p className="text-white/90 text-sm md:text-base font-medium max-w-sm leading-relaxed">
               Hand-picked almonds, cashews, pistachios and more. The finest quality dry fruits delivered fresh to your home.
             </p>
-            <button className="mt-4 bg-white text-black font-bold px-8 py-3 rounded-full text-sm hover:bg-secondary hover:text-black transition-all duration-300 shadow-lg flex items-center gap-2 w-fit transform hover:-translate-y-1">
+            <button className="mt-4 bg-white text-black font-bold px-8 py-3 rounded-full text-sm hover:bg-primary hover:text-white transition-all duration-300 shadow-lg flex items-center gap-2 w-fit transform hover:-translate-y-1">
               Shop Healthy
               <ArrowRight size={16} />
             </button>

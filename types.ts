@@ -11,6 +11,7 @@ export interface Product {
   category: string;
   tags?: string[];
   stockStatus?: string;
+  description?: string;
 }
 
 export interface Badge {

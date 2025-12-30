@@ -46,7 +46,7 @@ const Footer: React.FC = () => {
                 placeholder="E-mail" 
                 className="bg-transparent border border-gray-700 rounded text-sm px-4 py-2.5 w-full focus:outline-none focus:border-white transition-colors text-white placeholder-gray-500"
               />
-              <button className="bg-white text-black font-bold text-xs px-6 py-2.5 rounded hover:bg-gray-200 transition-colors uppercase tracking-wider">
+              <button className="bg-white text-black font-bold px-8 py-3 rounded-full text-sm hover:bg-gray-200 transition-all duration-300 uppercase tracking-wider whitespace-nowrap">
                 Subscribe
               </button>
             </div>

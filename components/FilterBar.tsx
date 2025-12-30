@@ -58,7 +58,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
           <div className="md:hidden relative">
             <button 
               onClick={() => toggleDropdown('mobileSort')}
-              className="flex items-center gap-2 text-sm font-bold text-gray-600 bg-white px-3 py-2 rounded-lg border border-gray-200 shadow-sm"
+              className="flex items-center gap-2 text-sm font-bold text-gray-600 bg-white px-5 py-3 rounded-lg border border-gray-200 shadow-sm"
             >
                <span>Sort</span>
                <ChevronDown size={14} />
@@ -166,7 +166,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
           <div className="hidden md:block relative">
             <button 
               onClick={() => toggleDropdown('sort')}
-              className="bg-white border border-gray-300 text-black text-sm font-bold px-5 py-2.5 rounded-lg flex items-center gap-8 hover:border-gray-400 transition shadow-sm"
+              className="bg-white border border-gray-300 text-black text-sm font-bold px-8 py-3.5 rounded-lg flex items-center gap-8 hover:border-gray-400 transition shadow-sm"
             >
                Sort by: {sortBy === 'default' ? 'Recommended' : sortBy === 'price-asc' ? 'Low to High' : sortBy === 'price-desc' ? 'High to Low' : 'Rating'} 
                <ChevronDown size={14} />
