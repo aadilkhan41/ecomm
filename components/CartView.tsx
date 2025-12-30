@@ -48,7 +48,7 @@ const CartView: React.FC<CartViewProps> = ({
 
   return (
     <div className="container mx-auto px-4 py-8 font-sans">
-      <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
+      <div className="flex flex-col xl:flex-row gap-8 xl:gap-20">
         
         {/* Left Column: Cart Items */}
         <div className="flex-grow">
@@ -181,7 +181,7 @@ const CartView: React.FC<CartViewProps> = ({
         </div>
 
         {/* Right Column: Summary */}
-        <div className="w-full lg:w-[400px] flex-shrink-0">
+        <div className="w-full xl:w-[380px] flex-shrink-0">
           <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.06)] p-8 sticky top-24">
             <h3 className="text-xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-100">Order Summary</h3>
             

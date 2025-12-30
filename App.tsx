@@ -5,6 +5,7 @@ import ProductCard from './components/ProductCard';
 import ProductView from './components/ProductView';
 import CartView from './components/CartView';
 import CheckoutView from './components/CheckoutView';
+import WishlistView from './components/WishlistView';
 import Pagination from './components/Pagination';
 import Footer from './components/Footer';
 import { Product, Badge } from './types';
@@ -24,7 +25,6 @@ const PRODUCTS: Product[] = RAW_PRODUCTS.map((item, index) => {
     if (item.tags.includes('gift wrapped')) badges.push({ text: 'Gift', type: 'new' });
   }
 
-  // Determine original price if on offer (simulation)
   let originalPrice = undefined;
   if (item.tags && item.tags.includes('offer')) {
     originalPrice = Math.round(item.price * 1.2);
@@ -48,7 +48,7 @@ const PRODUCTS: Product[] = RAW_PRODUCTS.map((item, index) => {
 });
 
 type SortOption = 'popularity' | 'priceLowToHigh' | 'priceHighToLow' | 'newest';
-type ViewState = 'home' | 'product' | 'cart' | 'checkout';
+type ViewState = 'home' | 'product' | 'cart' | 'checkout' | 'wishlist';
 
 const SORT_OPTIONS: { id: SortOption; label: string }[] = [
   { id: 'popularity', label: 'Popularity' },
@@ -63,11 +63,9 @@ interface CartItem {
 }
 
 const App: React.FC = () => {
-  // State for Navigation/View
   const [currentView, setCurrentView] = useState<ViewState>('home');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  // State for Data with initial values from localStorage
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     const savedCart = localStorage.getItem(CART_STORAGE_KEY);
     return savedCart ? JSON.parse(savedCart) : [];
@@ -81,7 +79,6 @@ const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // -- FILTER & SORT STATES --
   const [selectedCategory, setSelectedCategory] = useState('All Category');
   const [showOffersOnly, setShowOffersOnly] = useState(false);
   const [showHighRatedOnly, setShowHighRatedOnly] = useState(false);
@@ -91,7 +88,6 @@ const App: React.FC = () => {
 
   const itemsPerPage = 12;
 
-  // -- PERSISTENCE --
   useEffect(() => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
   }, [cartItems]);
@@ -100,7 +96,6 @@ const App: React.FC = () => {
     localStorage.setItem(LIKES_STORAGE_KEY, JSON.stringify(likedProductIds));
   }, [likedProductIds]);
 
-  // -- CART ACTIONS --
   const handleAddToCart = (product: Product, quantity = 1) => {
     setCartItems(prev => {
       const existingItem = prev.find(item => item.product.id === product.id);
@@ -135,7 +130,6 @@ const App: React.FC = () => {
     setCartItems(prev => prev.filter(item => item.product.id !== productId));
   };
 
-  // -- LIKE ACTIONS --
   const handleToggleLike = (productId: number | string) => {
     setLikedProductIds(prev => 
       prev.includes(productId) 
@@ -162,7 +156,6 @@ const App: React.FC = () => {
     setCurrentView('home');
   };
 
-  // -- NAVIGATION ACTIONS --
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -189,6 +182,11 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleWishlistClick = () => {
+    setCurrentView('wishlist');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   const handleGoHome = () => {
     setCurrentView('home');
     setSelectedProduct(null);
@@ -200,11 +198,9 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Filter & Sort Logic
   const filteredProducts = useMemo(() => {
     let result = [...PRODUCTS];
 
-    // 1. Search
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       result = result.filter(p => 
@@ -213,27 +209,22 @@ const App: React.FC = () => {
       );
     }
 
-    // 2. Category Filter
     if (selectedCategory !== 'All Category') {
       result = result.filter(p => p.category === selectedCategory);
     }
 
-    // 3. Offer Filter
     if (showOffersOnly) {
       result = result.filter(p => p.tags && p.tags.includes('offer'));
     }
 
-    // 4. Rating Filter
     if (showHighRatedOnly) {
       result = result.filter(p => p.rating >= 4.0);
     }
 
-    // 5. Best Selling Filter
     if (showBestSellingOnly) {
       result = result.filter(p => p.tags && p.tags.includes('best seller'));
     }
 
-    // 6. Sorting
     switch (sortBy) {
       case 'priceLowToHigh':
         result.sort((a, b) => a.price - b.price);
@@ -253,7 +244,10 @@ const App: React.FC = () => {
     return result;
   }, [searchQuery, selectedCategory, showOffersOnly, showHighRatedOnly, showBestSellingOnly, sortBy]);
 
-  // Pagination Logic
+  const wishlistProducts = useMemo(() => {
+    return PRODUCTS.filter(p => likedProductIds.includes(p.id));
+  }, [likedProductIds]);
+
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const currentProducts = useMemo(() => {
     const firstPageIndex = (currentPage - 1) * itemsPerPage;
@@ -261,20 +255,21 @@ const App: React.FC = () => {
     return filteredProducts.slice(firstPageIndex, lastPageIndex);
   }, [currentPage, filteredProducts]);
 
-  // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, selectedCategory, showOffersOnly, showHighRatedOnly, showBestSellingOnly, sortBy]);
 
-  // Calculate cart total count
   const cartTotalCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const wishlistCount = likedProductIds.length;
 
   return (
     <div className="min-h-screen flex flex-col font-sans">
       <Header 
         cartCount={cartTotalCount} 
+        wishlistCount={wishlistCount}
         onSearch={setSearchQuery}
         onCartClick={handleCartClick}
+        onWishlistClick={handleWishlistClick}
         onLogoClick={handleGoHome}
         selectedCategory={selectedCategory}
         onSelectCategory={(cat) => {
@@ -315,6 +310,16 @@ const App: React.FC = () => {
             onCheckout={handleCheckout}
             onClearCart={handleGoHome}
           />
+        ) : currentView === 'wishlist' ? (
+          <WishlistView 
+            products={wishlistProducts}
+            onProductClick={handleProductClick}
+            onAddToCart={handleAddToCart}
+            onRemoveFromCart={handleUpdateCartQuantity}
+            onToggleLike={handleToggleLike}
+            onBack={handleGoHome}
+            cartItems={cartItems}
+          />
         ) : currentView === 'product' && selectedProduct ? (
           <ProductView 
             product={selectedProduct} 
@@ -340,9 +345,7 @@ const App: React.FC = () => {
                 </div>
               ) : (
                 <>
-                  {/* Sort Bar */}
                   <div className="mb-6">
-                    {/* Desktop Sort View */}
                     <div className="hidden md:flex flex-wrap items-center gap-x-6 gap-y-3">
                       <span className="font-bold text-gray-900 text-sm shrink-0">Sort By</span>
                       {SORT_OPTIONS.map((option) => (
@@ -360,7 +363,6 @@ const App: React.FC = () => {
                       ))}
                     </div>
 
-                    {/* Mobile Sort Dropdown View */}
                     <div className="md:hidden relative">
                       <button 
                         onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
@@ -397,7 +399,7 @@ const App: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
+                  <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
                     {currentProducts.map((product) => {
                       const qty = cartItems.find(item => item.product.id === product.id)?.quantity || 0;
                       return (
@@ -406,7 +408,7 @@ const App: React.FC = () => {
                           product={product} 
                           quantity={qty}
                           onAdd={(p) => handleAddToCart(p, 1)} 
-                          onRemove={(p) => handleUpdateCartQuantity(p.id, -1)}
+                          onRemove={(productId) => handleUpdateCartQuantity(productId, -1)}
                           onClick={handleProductClick}
                           isLiked={likedProductIds.includes(product.id)}
                           onToggleLike={handleToggleLike}
@@ -429,7 +431,7 @@ const App: React.FC = () => {
         )}
       </main>
       
-      <Footer />
+      <Footer onCartClick={handleCartClick} onWishlistClick={handleWishlistClick} />
     </div>
   );
 };

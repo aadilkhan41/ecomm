@@ -6,7 +6,7 @@ interface ProductCardProps {
   product: Product;
   quantity?: number;
   onAdd: (product: Product) => void;
-  onRemove: (product: Product) => void;
+  onRemove: (productId: number | string) => void;
   onClick?: (product: Product) => void;
   isLiked?: boolean;
   onToggleLike?: (productId: string | number) => void;
@@ -22,7 +22,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
   onToggleLike
 }) => {
 
-  // Helper to get badge style
   const getBadgeStyle = (type: string) => {
     switch (type) {
       case 'sale': return 'bg-badgeRed text-white';
@@ -36,7 +35,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.08)] hover:border-primary/20 transition-all duration-300 group relative flex flex-col h-full">
-      {/* Badges (Top Left) */}
       <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-10">
         {product.badges.map((badge, index) => (
           <span 
@@ -48,7 +46,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
         ))}
       </div>
 
-      {/* Like Button (Top Right) */}
       <button 
         onClick={(e) => {
           e.stopPropagation();
@@ -62,7 +59,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
         />
       </button>
 
-      {/* Image Area */}
       <div 
         onClick={() => onClick && onClick(product)}
         className="w-full aspect-square mb-4 flex items-center justify-center overflow-hidden rounded-2xl bg-gray-50/50 cursor-pointer"
@@ -74,7 +70,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
         />
       </div>
 
-      {/* Content */}
       <div className="flex flex-col flex-grow">
         <h3 
           onClick={() => onClick && onClick(product)}
@@ -84,13 +79,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </h3>
         <p className="text-xs text-gray-400 mt-1 font-medium">{product.weight}</p>
 
-        {/* Rating */}
         <div className="flex items-center mt-2 mb-3">
           <Star size={12} className="text-primary fill-primary" />
           <span className="text-xs text-gray-500 ml-1 font-semibold">{product.rating} ({product.reviews})</span>
         </div>
 
-        {/* Price & Add Button */}
         <div className="mt-auto flex items-center justify-between gap-2">
           <div className="flex flex-col">
             <div className="flex items-center gap-2">

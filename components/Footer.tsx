@@ -1,7 +1,12 @@
 import React from 'react';
 import { Facebook, Twitter, Linkedin, Github } from 'lucide-react';
 
-const Footer: React.FC = () => {
+interface FooterProps {
+  onCartClick: () => void;
+  onWishlistClick: () => void;
+}
+
+const Footer: React.FC<FooterProps> = ({ onCartClick, onWishlistClick }) => {
   return (
     <footer className="bg-[#111111] text-white pt-16 pb-8 font-sans">
       <div className="container mx-auto px-6 md:px-12">
@@ -9,7 +14,7 @@ const Footer: React.FC = () => {
           
           {/* Brand Column */}
           <div className="space-y-6">
-            <h2 className="text-4xl font-bold tracking-tighter">liv.</h2>
+            <h2 className="text-4xl font-bold tracking-tighter">Shri.</h2>
             <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
               We're based in Palo-Alto where our doors first opened in 2015. We're part of a vibrant creative community and love what we do.
             </p>
@@ -21,19 +26,30 @@ const Footer: React.FC = () => {
             <ul className="space-y-4 text-sm text-gray-400">
               <li><a href="#" className="hover:text-white transition-colors">Terms & Conditions</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Project Protection</a></li>
               <li><a href="#" className="hover:text-white transition-colors">FAQs</a></li>
             </ul>
           </div>
 
-          {/* About Links */}
+          {/* Navigation Links */}
           <div>
-            <h3 className="text-white font-bold mb-6">About</h3>
+            <h3 className="text-white font-bold mb-6">Navigation</h3>
             <ul className="space-y-4 text-sm text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">Team</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Store</a></li>
+              <li>
+                <button 
+                  onClick={onCartClick}
+                  className="hover:text-white transition-colors text-left"
+                >
+                  Cart
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={onWishlistClick}
+                  className="hover:text-white transition-colors text-left"
+                >
+                  Wishlist
+                </button>
+              </li>
             </ul>
           </div>
 
