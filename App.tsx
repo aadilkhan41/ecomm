@@ -86,7 +86,7 @@ const App: React.FC = () => {
   const [sortBy, setSortBy] = useState<SortOption>('popularity');
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
 
-  const itemsPerPage = 12;
+  const itemsPerPage = 30;
 
   useEffect(() => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
