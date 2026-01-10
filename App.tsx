@@ -8,6 +8,9 @@ import CheckoutView from './components/CheckoutView';
 import WishlistView from './components/WishlistView';
 import Pagination from './components/Pagination';
 import Footer from './components/Footer';
+import TermsView from './components/TermsView';
+import PrivacyView from './components/PrivacyView';
+import FAQView from './components/FAQView';
 import { Product, Badge } from './types';
 import { RAW_PRODUCTS } from './data';
 import { ChevronDown } from 'lucide-react';
@@ -16,7 +19,6 @@ import { ChevronDown } from 'lucide-react';
 const CART_STORAGE_KEY = 'liv_dry_fruits_cart';
 const LIKES_STORAGE_KEY = 'liv_dry_fruits_likes';
 
-// Map raw JSON to application Product type
 const PRODUCTS: Product[] = RAW_PRODUCTS.map((item, index) => {
   const badges: Badge[] = [];
   if (item.tags) {
@@ -31,7 +33,7 @@ const PRODUCTS: Product[] = RAW_PRODUCTS.map((item, index) => {
   }
 
   return {
-    id: index + 1,
+    id: String(index + 1),
     title: item.title || item.name,
     weight: `${item.weight_g}g`,
     price: item.price,
@@ -47,8 +49,8 @@ const PRODUCTS: Product[] = RAW_PRODUCTS.map((item, index) => {
   };
 });
 
+type ViewState = 'home' | 'product' | 'cart' | 'checkout' | 'wishlist' | 'terms' | 'privacy' | 'faq';
 type SortOption = 'popularity' | 'priceLowToHigh' | 'priceHighToLow' | 'newest';
-type ViewState = 'home' | 'product' | 'cart' | 'checkout' | 'wishlist';
 
 const SORT_OPTIONS: { id: SortOption; label: string }[] = [
   { id: 'popularity', label: 'Popularity' },
@@ -64,7 +66,7 @@ interface CartItem {
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('home');
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     const savedCart = localStorage.getItem(CART_STORAGE_KEY);
@@ -78,7 +80,6 @@ const App: React.FC = () => {
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState('');
-  
   const [selectedCategory, setSelectedCategory] = useState('All Category');
   const [showOffersOnly, setShowOffersOnly] = useState(false);
   const [showHighRatedOnly, setShowHighRatedOnly] = useState(false);
@@ -86,7 +87,7 @@ const App: React.FC = () => {
   const [sortBy, setSortBy] = useState<SortOption>('popularity');
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
 
-  const itemsPerPage = 30;
+  const itemsPerPage = 12;
 
   useEffect(() => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
@@ -138,210 +139,103 @@ const App: React.FC = () => {
     );
   };
 
-  const handleClearCart = () => {
-    setCartItems([]);
-    if (currentView === 'cart') setCurrentView('home');
-  };
-
-  const handleCheckout = () => {
-    if (cartItems.length > 0) {
-      setCurrentView('checkout');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-
-  const handlePlaceOrder = () => {
-    alert("Order Placed Successfully! (Simulation)");
-    setCartItems([]);
-    setCurrentView('home');
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleCustomerService = () => {
-    alert("Customer Service Page - Coming Soon!");
-  };
-
-  const handleProductClick = (product: Product) => {
-    setSelectedProduct(product);
-    setCurrentView('product');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleBackToList = () => {
-    setSelectedProduct(null);
-    setCurrentView('home');
-    setSearchQuery('');
-  };
-
-  const handleCartClick = () => {
-    setCurrentView('cart');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleWishlistClick = () => {
-    setCurrentView('wishlist');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  const handleGoHome = () => {
-    setCurrentView('home');
-    setSelectedProduct(null);
-    setSelectedCategory('All Category');
-    setSearchQuery('');
-    setShowOffersOnly(false);
-    setShowHighRatedOnly(false);
-    setShowBestSellingOnly(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   const filteredProducts = useMemo(() => {
     let result = [...PRODUCTS];
-
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      result = result.filter(p => 
-        p.title.toLowerCase().includes(q) || 
-        p.category.toLowerCase().includes(q)
-      );
+      result = result.filter(p => p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
     }
-
     if (selectedCategory !== 'All Category') {
       result = result.filter(p => p.category === selectedCategory);
     }
-
-    if (showOffersOnly) {
-      result = result.filter(p => p.tags && p.tags.includes('offer'));
-    }
-
-    if (showHighRatedOnly) {
-      result = result.filter(p => p.rating >= 4.0);
-    }
-
-    if (showBestSellingOnly) {
-      result = result.filter(p => p.tags && p.tags.includes('best seller'));
-    }
+    if (showOffersOnly) result = result.filter(p => p.tags && p.tags.includes('offer'));
+    if (showHighRatedOnly) result = result.filter(p => p.rating >= 4.0);
+    if (showBestSellingOnly) result = result.filter(p => p.tags && p.tags.includes('best seller'));
 
     switch (sortBy) {
-      case 'priceLowToHigh':
-        result.sort((a, b) => a.price - b.price);
-        break;
-      case 'priceHighToLow':
-        result.sort((a, b) => b.price - a.price);
-        break;
-      case 'newest':
-        result.sort((a, b) => Number(b.id) - Number(a.id));
-        break;
-      case 'popularity':
-      default:
-        result.sort((a, b) => b.reviews - a.reviews);
-        break;
+      case 'priceLowToHigh': result.sort((a, b) => a.price - b.price); break;
+      case 'priceHighToLow': result.sort((a, b) => b.price - a.price); break;
+      case 'newest': result.sort((a, b) => Number(b.id) - Number(a.id)); break;
+      case 'popularity': default: result.sort((a, b) => b.reviews - a.reviews); break;
     }
-
     return result;
   }, [searchQuery, selectedCategory, showOffersOnly, showHighRatedOnly, showBestSellingOnly, sortBy]);
 
-  const wishlistProducts = useMemo(() => {
-    return PRODUCTS.filter(p => likedProductIds.includes(p.id));
-  }, [likedProductIds]);
-
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const currentProducts = useMemo(() => {
-    const firstPageIndex = (currentPage - 1) * itemsPerPage;
-    const lastPageIndex = firstPageIndex + itemsPerPage;
-    return filteredProducts.slice(firstPageIndex, lastPageIndex);
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredProducts.slice(start, start + itemsPerPage);
   }, [currentPage, filteredProducts]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedCategory, showOffersOnly, showHighRatedOnly, showBestSellingOnly, sortBy]);
 
   const cartTotalCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const wishlistCount = likedProductIds.length;
 
-  return (
-    <div className="min-h-screen flex flex-col font-sans">
-      <Header 
-        cartCount={cartTotalCount} 
-        wishlistCount={wishlistCount}
-        onSearch={setSearchQuery}
-        onCartClick={handleCartClick}
-        onWishlistClick={handleWishlistClick}
-        onLogoClick={handleGoHome}
-        selectedCategory={selectedCategory}
-        onSelectCategory={(cat) => {
-          setSelectedCategory(cat);
-          if (currentView !== 'home') setCurrentView('home');
-          setSelectedProduct(null);
-        }}
-        showOffersOnly={showOffersOnly}
-        onToggleOffers={() => {
-          setShowOffersOnly(!showOffersOnly);
-          if (currentView !== 'home') setCurrentView('home');
-        }}
-        showHighRatedOnly={showHighRatedOnly}
-        onToggleHighRated={() => {
-          setShowHighRatedOnly(!showHighRatedOnly);
-          if (currentView !== 'home') setCurrentView('home');
-        }}
-        showBestSellingOnly={showBestSellingOnly}
-        onToggleBestSelling={() => {
-          setShowBestSellingOnly(!showBestSellingOnly);
-          if (currentView !== 'home') setCurrentView('home');
-        }}
-        onCustomerServiceClick={handleCustomerService}
-      />
-      
-      <main className="flex-grow bg-white">
-        {currentView === 'checkout' ? (
-          <CheckoutView 
-            items={cartItems}
-            onBack={() => setCurrentView('cart')}
-            onPlaceOrder={handlePlaceOrder}
-          />
-        ) : currentView === 'cart' ? (
-          <CartView 
-            items={cartItems}
-            onUpdateQuantity={handleUpdateCartQuantity}
-            onRemoveItem={handleRemoveFromCart}
-            onCheckout={handleCheckout}
-            onClearCart={handleGoHome}
-          />
-        ) : currentView === 'wishlist' ? (
-          <WishlistView 
-            products={wishlistProducts}
-            onProductClick={handleProductClick}
-            onAddToCart={handleAddToCart}
-            onRemoveFromCart={handleUpdateCartQuantity}
-            onToggleLike={handleToggleLike}
-            onBack={handleGoHome}
-            cartItems={cartItems}
-          />
-        ) : currentView === 'product' && selectedProduct ? (
+  const navigateTo = (view: ViewState, productId: string | null = null) => {
+    setCurrentView(view);
+    setSelectedProductId(productId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const renderContent = () => {
+    switch (currentView) {
+      case 'product':
+        const product = PRODUCTS.find(p => p.id === selectedProductId);
+        if (!product) return <div className="p-20 text-center text-gray-500 font-bold">Product not found.</div>;
+        return (
           <ProductView 
-            product={selectedProduct} 
-            onBack={handleBackToList}
+            product={product} 
+            onBack={() => navigateTo('home')}
             onAddToCart={handleAddToCart}
-            isLiked={likedProductIds.includes(selectedProduct.id)}
-            onToggleLike={() => handleToggleLike(selectedProduct.id)}
+            isLiked={likedProductIds.includes(product.id)}
+            onToggleLike={() => handleToggleLike(product.id)}
           />
-        ) : (
+        );
+      case 'cart':
+        return (
+          <CartView 
+            items={cartItems} 
+            onUpdateQuantity={handleUpdateCartQuantity} 
+            onRemoveItem={handleRemoveFromCart} 
+            onCheckout={() => navigateTo('checkout')} 
+            onClearCart={() => navigateTo('home')} 
+          />
+        );
+      case 'checkout':
+        return (
+          <CheckoutView 
+            items={cartItems} 
+            onBack={() => navigateTo('cart')} 
+            onPlaceOrder={() => { alert("Order Placed Successfully!"); setCartItems([]); navigateTo('home'); }} 
+          />
+        );
+      case 'wishlist':
+        return (
+          <WishlistView 
+            products={PRODUCTS.filter(p => likedProductIds.includes(p.id))} 
+            onProductClick={(p) => navigateTo('product', String(p.id))} 
+            onAddToCart={handleAddToCart} 
+            onRemoveFromCart={handleUpdateCartQuantity} 
+            onToggleLike={handleToggleLike} 
+            onBack={() => navigateTo('home')} 
+            cartItems={cartItems} 
+          />
+        );
+      case 'terms':
+        return <TermsView onBack={() => navigateTo('home')} />;
+      case 'privacy':
+        return <PrivacyView onBack={() => navigateTo('home')} />;
+      case 'faq':
+        return <FAQView onBack={() => navigateTo('home')} />;
+      case 'home':
+      default:
+        return (
           <>
             {!searchQuery && <Hero />}
-            
             <div className="container mx-auto px-4 py-6">
               {filteredProducts.length === 0 ? (
                 <div className="text-center py-20">
-                  <h3 className="text-xl font-bold text-gray-400">No products found matching your criteria.</h3>
-                  <button 
-                    onClick={handleGoHome}
-                    className="mt-4 text-primary font-bold hover:underline"
-                  >
-                    Clear all filters
-                  </button>
+                  <h3 className="text-xl font-bold text-gray-400">No products found.</h3>
+                  <button onClick={() => {setSearchQuery(''); setSelectedCategory('All Category');}} className="mt-4 text-primary font-bold hover:underline">Clear all filters</button>
                 </div>
               ) : (
                 <>
@@ -349,89 +243,75 @@ const App: React.FC = () => {
                     <div className="hidden md:flex flex-wrap items-center gap-x-6 gap-y-3">
                       <span className="font-bold text-gray-900 text-sm shrink-0">Sort By</span>
                       {SORT_OPTIONS.map((option) => (
-                        <button
-                          key={option.id}
-                          onClick={() => setSortBy(option.id)}
-                          className={`whitespace-nowrap text-sm font-medium transition-colors pb-1 border-b-2 ${
-                            sortBy === option.id
-                              ? 'text-primary border-primary'
-                              : 'text-gray-700 border-transparent hover:text-primary hover:border-gray-300'
-                          }`}
-                        >
-                          {option.label}
-                        </button>
+                        <button key={option.id} onClick={() => setSortBy(option.id)} className={`text-sm font-medium transition-colors pb-1 border-b-2 ${sortBy === option.id ? 'text-primary border-primary' : 'text-gray-700 border-transparent hover:text-primary hover:border-gray-300'}`}>{option.label}</button>
                       ))}
                     </div>
-
                     <div className="md:hidden relative">
-                      <button 
-                        onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-                        className="w-full flex items-center justify-between bg-white border border-gray-200 rounded-xl px-6 py-4 text-sm font-bold shadow-sm active:bg-gray-50 transition-colors"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="text-gray-500 font-medium">Sort by:</span>
-                          <span className="text-primary">{SORT_OPTIONS.find(o => o.id === sortBy)?.label}</span>
-                        </div>
+                      <button onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)} className="w-full flex items-center justify-between bg-white border border-gray-200 rounded-xl px-6 py-4 text-sm font-bold shadow-sm active:bg-gray-50 transition-colors">
+                        <div className="flex items-center gap-2"><span className="text-gray-500 font-medium">Sort by:</span><span className="text-primary">{SORT_OPTIONS.find(o => o.id === sortBy)?.label}</span></div>
                         <ChevronDown size={18} className={`text-gray-400 transition-transform duration-200 ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
                       </button>
-                      
                       {isSortDropdownOpen && (
-                        <>
-                          <div className="fixed inset-0 z-20" onClick={() => setIsSortDropdownOpen(false)} />
-                          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 z-30 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                            {SORT_OPTIONS.map((option) => (
-                              <button
-                                key={option.id}
-                                onClick={() => {
-                                  setSortBy(option.id);
-                                  setIsSortDropdownOpen(false);
-                                }}
-                                className={`w-full text-left px-5 py-4 text-sm font-bold border-b border-gray-50 last:border-none transition-colors ${
-                                  sortBy === option.id ? 'text-primary bg-primary/5' : 'text-gray-700 active:bg-gray-50'
-                                }`}
-                              >
-                                {option.label}
-                              </button>
-                            ))}
-                          </div>
-                        </>
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 z-30 overflow-hidden">
+                          {SORT_OPTIONS.map((option) => (
+                            <button key={option.id} onClick={() => { setSortBy(option.id); setIsSortDropdownOpen(false); }} className={`w-full text-left px-5 py-4 text-sm font-bold border-b border-gray-50 last:border-none transition-colors ${sortBy === option.id ? 'text-primary bg-primary/5' : 'text-gray-700 active:bg-gray-50'}`}>{option.label}</button>
+                          ))}
+                        </div>
                       )}
                     </div>
                   </div>
-
                   <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
-                    {currentProducts.map((product) => {
-                      const qty = cartItems.find(item => item.product.id === product.id)?.quantity || 0;
-                      return (
-                        <ProductCard 
-                          key={product.id} 
-                          product={product} 
-                          quantity={qty}
-                          onAdd={(p) => handleAddToCart(p, 1)} 
-                          onRemove={(productId) => handleUpdateCartQuantity(productId, -1)}
-                          onClick={handleProductClick}
-                          isLiked={likedProductIds.includes(product.id)}
-                          onToggleLike={handleToggleLike}
-                        />
-                      );
-                    })}
+                    {currentProducts.map((product) => (
+                      <ProductCard 
+                        key={product.id} 
+                        product={product} 
+                        quantity={cartItems.find(item => item.product.id === product.id)?.quantity || 0} 
+                        onAdd={(p) => handleAddToCart(p, 1)} 
+                        onRemove={(id) => handleUpdateCartQuantity(id, -1)} 
+                        onClick={(p) => navigateTo('product', String(p.id))} 
+                        isLiked={likedProductIds.includes(product.id)} 
+                        onToggleLike={handleToggleLike} 
+                      />
+                    ))}
                   </div>
-                  
-                  {totalPages > 1 && (
-                    <Pagination 
-                      currentPage={currentPage} 
-                      totalPages={totalPages} 
-                      onPageChange={handlePageChange} 
-                    />
-                  )}
+                  {totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={(p) => {setCurrentPage(p); window.scrollTo({ top: 0, behavior: 'smooth' });}} />}
                 </>
               )}
             </div>
           </>
-        )}
+        );
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col font-sans">
+      <Header 
+        cartCount={cartTotalCount} 
+        wishlistCount={wishlistCount}
+        onSearch={(q) => { setSearchQuery(q); navigateTo('home'); }}
+        onCartClick={() => navigateTo('cart')}
+        onWishlistClick={() => navigateTo('wishlist')}
+        onLogoClick={() => navigateTo('home')}
+        selectedCategory={selectedCategory}
+        onSelectCategory={(cat) => { setSelectedCategory(cat); navigateTo('home'); }}
+        showOffersOnly={showOffersOnly}
+        onToggleOffers={() => { setShowOffersOnly(!showOffersOnly); navigateTo('home'); }}
+        showHighRatedOnly={showHighRatedOnly}
+        onToggleHighRated={() => { setShowHighRatedOnly(!showHighRatedOnly); navigateTo('home'); }}
+        showBestSellingOnly={showBestSellingOnly}
+        onToggleBestSelling={() => { setShowBestSellingOnly(!showBestSellingOnly); navigateTo('home'); }}
+        onCustomerServiceClick={() => navigateTo('faq')}
+      />
+      <main className="flex-grow bg-white">
+        {renderContent()}
       </main>
-      
-      <Footer onCartClick={handleCartClick} onWishlistClick={handleWishlistClick} />
+      <Footer 
+        onCartClick={() => navigateTo('cart')} 
+        onWishlistClick={() => navigateTo('wishlist')} 
+        onTermsClick={() => navigateTo('terms')} 
+        onPrivacyClick={() => navigateTo('privacy')} 
+        onFAQClick={() => navigateTo('faq')} 
+      />
     </div>
   );
 };

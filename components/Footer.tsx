@@ -4,9 +4,18 @@ import { Facebook, Twitter, Linkedin, Github } from 'lucide-react';
 interface FooterProps {
   onCartClick: () => void;
   onWishlistClick: () => void;
+  onTermsClick: () => void;
+  onPrivacyClick: () => void;
+  onFAQClick: () => void;
 }
 
-const Footer: React.FC<FooterProps> = ({ onCartClick, onWishlistClick }) => {
+const Footer: React.FC<FooterProps> = ({ 
+  onCartClick, 
+  onWishlistClick, 
+  onTermsClick, 
+  onPrivacyClick, 
+  onFAQClick 
+}) => {
   return (
     <footer className="bg-[#111111] text-white pt-16 pb-8 font-sans">
       <div className="container mx-auto px-6 md:px-12">
@@ -14,63 +23,62 @@ const Footer: React.FC<FooterProps> = ({ onCartClick, onWishlistClick }) => {
           
           {/* Brand Column */}
           <div className="space-y-6">
-            <h2 className="text-4xl font-bold tracking-tighter">Shri.</h2>
+            <h2 className="text-4xl font-bold tracking-tighter cursor-pointer hover:text-primary transition-colors">Shri.</h2>
             <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
-              We're based in Palo-Alto where our doors first opened in 2015. We're part of a vibrant creative community and love what we do.
+              Premium quality dry fruits and healthy snacks delivered across India. We believe in nature's purity and taste.
             </p>
           </div>
 
           {/* Company Links */}
           <div>
-            <h3 className="text-white font-bold mb-6">Company</h3>
+            <h3 className="text-white font-bold mb-6 text-lg">Company</h3>
             <ul className="space-y-4 text-sm text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">Terms & Conditions</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">FAQs</a></li>
+              <li>
+                <button onClick={onTermsClick} className="hover:text-primary transition-colors text-left">Terms & Conditions</button>
+              </li>
+              <li>
+                <button onClick={onPrivacyClick} className="hover:text-primary transition-colors text-left">Privacy Policy</button>
+              </li>
+              <li>
+                <button onClick={onFAQClick} className="hover:text-primary transition-colors text-left">FAQs</button>
+              </li>
             </ul>
           </div>
 
           {/* Navigation Links */}
           <div>
-            <h3 className="text-white font-bold mb-6">Navigation</h3>
+            <h3 className="text-white font-bold mb-6 text-lg">Quick Links</h3>
             <ul className="space-y-4 text-sm text-gray-400">
               <li>
-                <button 
-                  onClick={onCartClick}
-                  className="hover:text-white transition-colors text-left"
-                >
-                  Cart
-                </button>
+                <button onClick={onCartClick} className="hover:text-primary transition-colors text-left">My Cart</button>
               </li>
               <li>
-                <button 
-                  onClick={onWishlistClick}
-                  className="hover:text-white transition-colors text-left"
-                >
-                  Wishlist
-                </button>
+                <button onClick={onWishlistClick} className="hover:text-primary transition-colors text-left">My Wishlist</button>
               </li>
             </ul>
           </div>
 
           {/* Newsletter */}
           <div>
-            <h3 className="text-white font-bold mb-6">Sign up to our Newsletter</h3>
-            <div className="flex flex-col sm:flex-row gap-2 mb-8">
-              <input 
-                type="email" 
-                placeholder="E-mail" 
-                className="bg-transparent border border-gray-700 rounded text-sm px-4 py-2.5 w-full focus:outline-none focus:border-white transition-colors text-white placeholder-gray-500"
-              />
-              <button className="bg-white text-black font-bold px-8 py-3 rounded-full text-sm hover:bg-gray-200 transition-all duration-300 uppercase tracking-wider whitespace-nowrap">
-                Subscribe
-              </button>
+            <h3 className="text-white font-bold mb-6 text-lg">Stay Healthy</h3>
+            <p className="text-gray-400 text-xs mb-4">Sign up for healthy tips and special offers!</p>
+            <div className="flex flex-col gap-2 mb-8">
+              <div className="flex gap-2">
+                <input 
+                  type="email" 
+                  placeholder="E-mail" 
+                  className="bg-white/5 border border-gray-800 rounded-full text-sm px-5 py-3 w-full focus:outline-none focus:border-primary transition-colors text-white placeholder-gray-500"
+                />
+                <button className="bg-primary text-white font-bold px-6 py-3 rounded-full text-xs hover:bg-opacity-90 transition-all uppercase tracking-wider whitespace-nowrap">
+                  Join
+                </button>
+              </div>
             </div>
             <div className="flex items-center gap-6 text-white">
-              <a href="#" className="hover:text-gray-300 transition-colors"><Facebook size={20} fill="currentColor" strokeWidth={0} /></a>
-              <a href="#" className="hover:text-gray-300 transition-colors"><Twitter size={20} fill="currentColor" strokeWidth={0} /></a>
-              <a href="#" className="hover:text-gray-300 transition-colors"><Linkedin size={20} fill="currentColor" strokeWidth={0} /></a>
-              <a href="#" className="hover:text-gray-300 transition-colors"><Github size={20} fill="currentColor" strokeWidth={0} /></a>
+              <a href="#" className="hover:text-primary transition-colors"><Facebook size={20} fill="currentColor" strokeWidth={0} /></a>
+              <a href="#" className="hover:text-primary transition-colors"><Twitter size={20} fill="currentColor" strokeWidth={0} /></a>
+              <a href="#" className="hover:text-primary transition-colors"><Linkedin size={20} fill="currentColor" strokeWidth={0} /></a>
+              <a href="#" className="hover:text-primary transition-colors"><Github size={20} fill="currentColor" strokeWidth={0} /></a>
             </div>
           </div>
         </div>
@@ -78,7 +86,7 @@ const Footer: React.FC<FooterProps> = ({ onCartClick, onWishlistClick }) => {
         {/* Copyright */}
         <div className="border-t border-gray-800 pt-8 text-center">
           <p className="text-gray-500 text-sm">
-            Copyright © 2016 Ease Corp. Created by KK UI Store
+            Copyright © 2023 Shri Shyam Enterprises. All Rights Reserved.
           </p>
         </div>
       </div>
